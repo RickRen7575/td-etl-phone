@@ -116,19 +116,19 @@ class PhoneEtlApplication extends APIETLApplication implements CommandLineRunner
                 count = 0
             }
 
-            count += processPhoneCall(phoneCallRaw, buffer)
-
-            if (buffer.size() > 0) {
-                // if the buffer is not empty, write its content to a S3 object
-                executor.execute {
-                    createS3Object(buffer)
-                }
-            }
-
-            executor.shutdown()
-
-            LOGGER.info("$count records in total were extracted.")
+            count += processPhoneCall(phoneCallRaw, buffer)            
         }
+
+        if (buffer.size() > 0) {
+            // if the buffer is not empty, write its content to a S3 object
+            executor.execute {
+                createS3Object(buffer)
+            }
+        }
+
+        executor.shutdown()
+
+        LOGGER.info("$count records in total were extracted.")
     }
 
     public Integer processPhoneCall(def phoneCallRaw, List<PhoneCall> buffer) {
