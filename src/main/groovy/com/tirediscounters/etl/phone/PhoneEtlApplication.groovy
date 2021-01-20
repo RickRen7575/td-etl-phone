@@ -64,6 +64,7 @@ class PhoneEtlApplication extends APIETLApplication implements CommandLineRunner
 		akixiUsername = programEnvironment.getRequiredPropertyAsString("akixi.phone.username")
 		akixiPassword = programEnvironment.getRequiredPropertyAsString("akixi.phone.pw")
 		akixiApiUrl = programEnvironment.getRequiredPropertyAsString("akixi.phone.url")
+		this.m_batchSize = programEnvironment.getRequiredPropertyAsString("batch.size")
         
 	    if (programArguments.getArgumentAsString("localPath").isPresent()) {
             this.m_localPath = programArguments.getArgumentAsString("localPath").get()
