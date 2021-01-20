@@ -53,4 +53,17 @@ class PhoneCall extends FactETLRecord {
 	String m_agentNameOffered
 	String m_reasonEnded
 	String m_reasonStarted
+
+	protected String getGetterName(final String fieldName) {
+        if (fieldName == 'key') return super.getGetterName(fieldName)
+        else if (fieldName == 'row_hash') return 'getRowHash'
+        else if (fieldName == 'row_creation_timestamp') return 'getRowCreationTimestamp'
+        String getterName = 'getM_'
+        List<String> fieldParts = Arrays.asList(fieldName.replaceAll('_', ' ').split(' '))
+        for (int index = 0; index < fieldParts.size(); index++) {
+            if (index == 0) getterName += fieldParts.get(index)
+            else getterName += fieldParts.get(index).capitalize()
+        }
+        return getterName
+    }
 }
