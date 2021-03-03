@@ -49,3 +49,4 @@ def addPackageSuffix(String version, String profile) {
 def addAdditionalParams(String additionalParams) {
     additionalParams = additionalParams != 'NULL' ? additionalParams : ' '
     return additionalParams + ' '
+}
