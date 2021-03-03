@@ -10,7 +10,7 @@
     </parent>
     <groupId>com.tirediscounters</groupId>
     <artifactId>td-etl-phone</artifactId>
-    <version>0.1.0${version.suffix}</version>
+    <version>0.2.0${version.suffix}</version>
     <name>td-etl-phone</name>
     <description>ETL program for the phone fact table</description>
 

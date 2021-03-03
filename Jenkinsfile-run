@@ -1,0 +1,51 @@
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
+
+pipeline {
+    agent any
+    tools { 
+        maven 'Maven 3.6.3' 
+        jdk 'jdk8' 
+    }
+    parameters { 
+        choice(name: 'PROFILE', choices: ['dev', 'qa', 'prod'], description: 'This determines whether this is a run job or a build job')
+        string(name: 'ADDITIONAL_PARAMS', defaultValue: 'NULL', description: 'Additional parameters to add to the execution of the ETL jobs.') 
+    }
+    environment {
+        NEXUS_API = 'https://nexus.tirediscountersdirect.com/nexus/service/rest/v1'
+        ARTIFACT = 'td-etl-phone'
+        VERSION = '0.2.0'
+    }
+    stages {
+        stage('Download ETL JAR') {
+            steps {
+                sh "curl -X GET --header 'Accept: application/json' '${NEXUS_API}/search/assets/download?sort=version&repository=${getMavenRepo(params.PROFILE)}&maven.groupId=com.tirediscounters&maven.artifactId=${ARTIFACT}&maven.baseVersion=${addPackageSuffix(VERSION, params.PROFILE)}&maven.extension=jar' -L -o ${ARTIFACT}.jar"
+            }
+        }
+        stage('Run ETL') {
+            steps {
+                configFileProvider(
+                    [configFile(fileId: '79d7480d-2378-4fe9-a767-b566fc6d90f8', variable: 'ENCRYPTION_KEY_FILE')]) {
+
+                    sh "java -jar ${ARTIFACT}.jar --spring.profiles.active=${PROFILE} --key.file=${env.ENCRYPTION_KEY_FILE} --secretkey.file.path=${env.ENCRYPTION_KEY_FILE} ${addAdditionalParams(params.ADDITIONAL_PARAMS)}"                       
+                }
+            }
+        }
+    }
+}
+
+def getMavenRepo(String profile) {
+    return ['qa', 'prod'].contains(profile)  ? 'maven-releases' : 'maven-snapshots'
+}
+
+def getPackageSuffix(Boolean isProd) {
+    return isProd ? '' : '-SNAPSHOT'
+}
+
+def addPackageSuffix(String version, String profile) {
+    return version + getPackageSuffix(['qa', 'prod'].contains(profile))
+}
+
+def addAdditionalParams(String additionalParams) {
+    additionalParams = additionalParams != 'NULL' ? additionalParams : ' '
+    return additionalParams + ' '
